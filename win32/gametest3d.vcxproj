@@ -48,10 +48,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Libraries\glew-1.12.0\include;C:\Libraries\SDL2-2.0.3\include;C:\Users\Bo\Desktop\gametest3d\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Libraries\glew-1.12.0\lib\Release\Win32;C:\Libraries\SDL2-2.0.3\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\FieryGametapes\IT485 - 3D\gametest3d2017\include;D:\FieryGametapes\IT485 - 3D\err thang\inc;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\FieryGametapes\IT485 - 3D\err thang\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\..</OutDir>
     <IntDir>$(ProjectDir)\..</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>D:\FieryGametapes\IT485 - 3D\gametest3d2017\include;D:\FieryGametapes\IT485 - 3D\err thang\inc;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LibraryPath>D:\FieryGametapes\IT485 - 3D\err thang\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
