@@ -46,4 +46,6 @@ GLuint graphics3d_get_shader_program();
  */
 void graphics3d_next_frame();
 
+void graphics3d_frame_begin();
+
 #endif

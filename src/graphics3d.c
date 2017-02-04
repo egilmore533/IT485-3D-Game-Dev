@@ -93,5 +93,13 @@ void graphics3d_close()
     SDL_GL_DeleteContext(__graphics3d_gl_context);
 }
 
+void graphics3d_frame_begin()
+{
+    glClearColor(0.0,0.0,0.0,0.0);
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    glLoadIdentity();
+    glPushMatrix();
+}
+
 
 /*eol@eof*/

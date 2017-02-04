@@ -15,11 +15,13 @@
     <ClCompile Include="..\src\graphics3d.c" />
     <ClCompile Include="..\src\shader.c" />
     <ClCompile Include="..\src\simple_logger.c" />
+    <ClCompile Include="..\src\vector.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\graphics3d.h" />
     <ClInclude Include="..\include\shader.h" />
     <ClInclude Include="..\include\simple_logger.h" />
+    <ClInclude Include="..\include\vector.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

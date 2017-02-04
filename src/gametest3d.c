@@ -21,15 +21,19 @@
 #include "simple_logger.h"
 #include "graphics3d.h"
 #include "shader.h"
+#include "vector.h"
 
 int main(int argc, char *argv[])
 {
-    GLuint vao;
+	Vect3D cameraPosition = vect3d(0.0f,-10.0f,0.3f);
+	Vect3D cameraRotation = vect3d(90.0f,0.0f,0.0f);
+
+    GLuint vao; //vao == vertex array object
     GLuint triangleBufferObject;
     char bGameLoopRunning = 1;
     SDL_Event e;
     const float triangleVertices[] = {
-        0.0f, 0.5f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f, 1.0f,
         0.5f, -0.366f, 0.0f, 1.0f,
         -0.5f, -0.366f, 0.0f, 1.0f,
         //next part contains vertex colors
@@ -60,8 +64,13 @@ int main(int argc, char *argv[])
         {
             if (e.type == SDL_QUIT)
                 bGameLoopRunning = 0;
-            else if (e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_ESCAPE)
-                bGameLoopRunning = 0;
+            else if (e.type == SDL_KEYDOWN)
+			{
+				if(e.key.keysym.sym == SDLK_ESCAPE)
+                {
+					bGameLoopRunning = 0;
+				}
+			}
         }
 
         glClearColor(0.0,0.0,0.0,0.0);
