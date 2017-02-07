@@ -46,6 +46,12 @@ int graphics3d_init(int sw,int sh,int fullscreen,const char *project,Uint32 fram
                               sw, sh,
                               SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
     
+	if(__graphics3d_window == NULL)
+	{
+		slog("FATAL: There was an error creating the SDL window!\n");
+		return -1;
+	
+	}
     
     __graphics3d_gl_context = SDL_GL_CreateContext(__graphics3d_window);
     if (__graphics3d_gl_context == NULL)
@@ -57,10 +63,11 @@ int graphics3d_init(int sw,int sh,int fullscreen,const char *project,Uint32 fram
     version = glGetString(GL_VERSION);
     if (version == NULL) 
     {
-        slog("There was an error creating the OpenGL context!\n");
+        slog("There was an error creating the OpenGL version number!\n");
         return -1;
     }
     
+	//if we wanted a minimap we would make another context here
     SDL_GL_MakeCurrent(__graphics3d_window, __graphics3d_gl_context);
     
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);

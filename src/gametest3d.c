@@ -21,19 +21,17 @@
 #include "simple_logger.h"
 #include "graphics3d.h"
 #include "shader.h"
-#include "vector.h"
+#include "glm\glm.hpp"
 
 int main(int argc, char *argv[])
 {
-	Vect3D cameraPosition = vect3d(0.0f,-10.0f,0.3f);
-	Vect3D cameraRotation = vect3d(90.0f,0.0f,0.0f);
 
     GLuint vao; //vao == vertex array object
     GLuint triangleBufferObject;
     char bGameLoopRunning = 1;
     SDL_Event e;
     const float triangleVertices[] = {
-        0.0f, 0.0f, 1.0f, 1.0f,
+        0.0f, 0.5f, 0.0f, 1.0f,
         0.5f, -0.366f, 0.0f, 1.0f,
         -0.5f, -0.366f, 0.0f, 1.0f,
         //next part contains vertex colors
@@ -82,7 +80,7 @@ int main(int argc, char *argv[])
         glEnableVertexAttribArray(0); //0 is our index, refer to "location = 0" in the vertex shader
         glEnableVertexAttribArray(1); //attribute 1 is for vertex color data
         glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0); //tell gl (shader!) how to interpret our vertex data
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)48); //color data is 48 bytes in to the array
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)(12 * sizeof(float))); //color data is 48 bytes in to the array
         glDrawArrays(GL_TRIANGLES, 0, 3);
         
         glDisableVertexAttribArray(0);

@@ -27,9 +27,6 @@
     <ClCompile Include="..\src\gametest3d.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\vector.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\graphics3d.h">
@@ -39,9 +36,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\simple_logger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
