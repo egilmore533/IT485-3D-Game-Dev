@@ -1,7 +1,7 @@
-#version 300 es
+#version 400 core
 smooth in vec4 theColor;
-out vec4 outputColor;
+out vec3 color;
 void main()
 {
-	outputColor = theColor;
+	color = vec3(1,0,0);
 }

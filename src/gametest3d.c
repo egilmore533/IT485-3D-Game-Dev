@@ -21,15 +21,39 @@
 #include "simple_logger.h"
 #include "graphics3d.h"
 #include "shader.h"
-#include "glm\glm.hpp"
+#include <glm\glm.hpp>
+#include <glm\gtx\transform2.hpp>
+
+#define WINDOW_WIDTH			1024.0f
+#define WINDOW_HEIGHT			768.0f
+#define ASPECT_RATIO			WINDOW_WIDTH / WINDOW_HEIGHT
+#define NEAR_CLIPPING_PLANE		0.1f
+#define FAR_CLIPPING_PLANE		100.0f
+
+static const GLfloat g_vertex_buffer_data[] = 
+{
+	-1.0f, -1.0f, 0.0f,
+	1.0f, -1.0f, 0.0f,
+	0.0f,  1.0f, 0.0f,
+};
 
 int main(int argc, char *argv[])
 {
+	glm::vec3 cameraPosition = glm::vec3(4.0f, 3.0f, 3.0f);
+	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::mat4 ViewMatrix = glm::translate(glm::vec3(-3.0f, 0.0f, 0.0f));
+	glm::mat4 view = glm::lookAt(cameraPosition, cameraTarget, glm::vec3(0.0f,1.0f,0.0f));
+	glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), ASPECT_RATIO, NEAR_CLIPPING_PLANE, FAR_CLIPPING_PLANE);
+	glm::mat4 model = glm::mat4(1.0f);
+	GLuint MatrixID; 
+	glm::mat4 model_view_projection = projectionMatrix * view * model;
+
 
     GLuint vao; //vao == vertex array object
     GLuint triangleBufferObject;
     char bGameLoopRunning = 1;
     SDL_Event e;
+
     const float triangleVertices[] = {
         0.0f, 0.5f, 0.0f, 1.0f,
         0.5f, -0.366f, 0.0f, 1.0f,
@@ -41,17 +65,20 @@ int main(int argc, char *argv[])
     }; //we love you vertices!
     
     init_logger("gametest3d.log");
-    if (graphics3d_init(1024,768,1,"gametest3d",33) != 0)
+    if (graphics3d_init(WINDOW_WIDTH,WINDOW_HEIGHT,1,"gametest3d",33) != 0)
     {
         return -1;
     }
+
+	MatrixID = glGetUniformLocation(graphics3d_get_shader_program(), "model_view_projection"); //this needs to match the uniform value in the shader file
+        
         
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao); //make our vertex array object, we need it to restore state we set after binding it. Re-binding reloads the state associated with it.
     
     glGenBuffers(1, &triangleBufferObject); //create the buffer
     glBindBuffer(GL_ARRAY_BUFFER, triangleBufferObject); //we're "using" this one now
-    glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW); //formatting the data for the buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW); //formatting the data for the buffer
     glBindBuffer(GL_ARRAY_BUFFER, 0); //unbind any buffers
     
     slog("glError: %d", glGetError());
@@ -75,8 +102,24 @@ int main(int argc, char *argv[])
         glClear(GL_COLOR_BUFFER_BIT);
 
         /* drawing code in here! */
-        glUseProgram(graphics3d_get_shader_program());
-        glBindBuffer(GL_ARRAY_BUFFER, triangleBufferObject); //bind the buffer we're applying attributes to
+		glUseProgram(graphics3d_get_shader_program());
+        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &model_view_projection[0][0]);
+
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, triangleBufferObject);
+		glVertexAttribPointer(
+		   0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+		   3,                  // size
+		   GL_FLOAT,           // type
+		   GL_FALSE,           // normalized?
+		   0,                  // stride
+		   (void*)0            // array buffer offset
+		);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDisableVertexAttribArray(0);
+		
+		/*
+		glBindBuffer(GL_ARRAY_BUFFER, triangleBufferObject); //bind the buffer we're applying attributes to
         glEnableVertexAttribArray(0); //0 is our index, refer to "location = 0" in the vertex shader
         glEnableVertexAttribArray(1); //attribute 1 is for vertex color data
         glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0); //tell gl (shader!) how to interpret our vertex data
@@ -86,6 +129,8 @@ int main(int argc, char *argv[])
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         glUseProgram(0);
+
+		*/
         /* drawing code above here! */
         graphics3d_next_frame();
     } 
