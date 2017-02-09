@@ -13,16 +13,25 @@
   <ItemGroup>
     <ClCompile Include="..\src\gametest3d.c" />
     <ClCompile Include="..\src\graphics3d.c" />
+    <ClCompile Include="..\src\input.c" />
     <ClCompile Include="..\src\shader.c" />
     <ClCompile Include="..\src\simple_logger.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\graphics3d.h" />
+    <ClInclude Include="..\include\input.h" />
     <ClInclude Include="..\include\shader.h" />
     <ClInclude Include="..\include\simple_logger.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C8351047-707B-4D68-A801-6749E9509337}</ProjectGuid>
@@ -68,6 +77,7 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>D:\FieryGametapes\IT485 - 3D\gametest3d2017\glm-0.9.8.4;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

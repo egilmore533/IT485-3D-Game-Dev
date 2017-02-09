@@ -18,17 +18,21 @@
  *    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *    SOFTWARE.
  */
+#include <glm\glm.hpp>
+#include <glm\gtx\transform.hpp>
 #include "simple_logger.h"
 #include "graphics3d.h"
 #include "shader.h"
-#include <glm\glm.hpp>
-#include <glm\gtx\transform2.hpp>
+#include "input.h"
 
 #define WINDOW_WIDTH			1024.0f
 #define WINDOW_HEIGHT			768.0f
 #define ASPECT_RATIO			WINDOW_WIDTH / WINDOW_HEIGHT
 #define NEAR_CLIPPING_PLANE		0.1f
 #define FAR_CLIPPING_PLANE		100.0f
+
+static Uint8	gameLoop = 1;
+static Command	*quitCommand = NULL;
 
 static const GLfloat g_vertex_buffer_data[] = {
     -1.0f,-1.0f,-1.0f, // triangle 1 : begin
@@ -108,22 +112,30 @@ static const GLfloat g_color_buffer_data[] = {
     0.982f,  0.099f,  0.879f
 };
 
+static void quit();
+
+char get_game_loop_status();
+
+void initialize_systems();
+
+void initialize_command();
+
+glm::vec3 updateCameraPosition(glm::vec3 cameraPosition, glm::mat4 translationMatrix);
+
 int main(int argc, char *argv[])
 {
 	glm::vec3 cameraPosition = glm::vec3(4.0f, 3.0f, 3.0f);
 	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::mat4 ViewMatrix = glm::translate(glm::vec3(-3.0f, 0.0f, 0.0f));
 	glm::mat4 view = glm::lookAt(cameraPosition, cameraTarget, glm::vec3(0.0f,1.0f,0.0f));
 	glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), ASPECT_RATIO, NEAR_CLIPPING_PLANE, FAR_CLIPPING_PLANE);
 	glm::mat4 model = glm::mat4(1.0f);
 	GLuint MatrixID; 
 	glm::mat4 model_view_projection = projectionMatrix * view * model;
+	glm::mat4 translationMatrix;
 
+	GLuint vao; //vao == vertex array object
+	GLuint cubeBufferObject;
 	GLuint colorbuffer;
-    GLuint vao; //vao == vertex array object
-    GLuint triangleBufferObject;
-    char bGameLoopRunning = 1;
-    SDL_Event e;
 
     const float triangleVertices[] = {
         0.0f, 0.5f, 0.0f, 1.0f,
@@ -135,11 +147,8 @@ int main(int argc, char *argv[])
         0.0f, 0.0f, 1.0f, 1.0f  
     }; //we love you vertices!
     
-    init_logger("gametest3d.log");
-    if (graphics3d_init(WINDOW_WIDTH,WINDOW_HEIGHT,1,"gametest3d",33) != 0)
-    {
-        return -1;
-    }
+    initialize_systems();
+	initialize_command();
 
 	MatrixID = glGetUniformLocation(graphics3d_get_shader_program(), "model_view_projection"); //this needs to match the uniform value in the shader file
         
@@ -147,8 +156,8 @@ int main(int argc, char *argv[])
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao); //make our vertex array object, we need it to restore state we set after binding it. Re-binding reloads the state associated with it.
     
-    glGenBuffers(1, &triangleBufferObject); //create the buffer
-    glBindBuffer(GL_ARRAY_BUFFER, triangleBufferObject); //we're "using" this one now
+    glGenBuffers(1, &cubeBufferObject); //create the buffer
+    glBindBuffer(GL_ARRAY_BUFFER, cubeBufferObject); //we're "using" this one now
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW); //formatting the data for the buffer
     glBindBuffer(GL_ARRAY_BUFFER, 0); //unbind any buffers
 
@@ -161,20 +170,11 @@ int main(int argc, char *argv[])
 
     slog("glError: %d", glGetError());
     
-    while (bGameLoopRunning)
+    while (get_game_loop_status())
     {
-        if ( SDL_PollEvent(&e) ) 
-        {
-            if (e.type == SDL_QUIT)
-                bGameLoopRunning = 0;
-            else if (e.type == SDL_KEYDOWN)
-			{
-				if(e.key.keysym.sym == SDLK_ESCAPE)
-                {
-					bGameLoopRunning = 0;
-				}
-			}
-        }
+		get_all_events();
+
+		model_view_projection = projectionMatrix * view * model;
 
         glClearColor(0.0,0.0,0.0,0.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &model_view_projection[0][0]);
 
 		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, triangleBufferObject);
+		glBindBuffer(GL_ARRAY_BUFFER, cubeBufferObject);
 		glVertexAttribPointer(
 		   0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
 		   3,                  // size
@@ -211,7 +211,7 @@ int main(int argc, char *argv[])
 		glEnableVertexAttribArray(1);
 
 		/*
-		glBindBuffer(GL_ARRAY_BUFFER, triangleBufferObject); //bind the buffer we're applying attributes to
+		glBindBuffer(GL_ARRAY_BUFFER, cubeBufferObject); //bind the buffer we're applying attributes to
         glEnableVertexAttribArray(0); //0 is our index, refer to "location = 0" in the vertex shader
         glEnableVertexAttribArray(1); //attribute 1 is for vertex color data
         glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0); //tell gl (shader!) how to interpret our vertex data
@@ -227,6 +227,32 @@ int main(int argc, char *argv[])
         graphics3d_next_frame();
     } 
     return 0;
+}
+
+static void quit()
+{
+	gameLoop = 0;
+	return;
+}
+
+char get_game_loop_status()
+{
+	return gameLoop;
+}
+
+void initialize_systems()
+{
+	init_logger("gametest3d.log");
+	if (graphics3d_init(WINDOW_WIDTH,WINDOW_HEIGHT,1,"gametest3d",33) != 0)
+    {
+        exit(-1);
+    }
+	command_initialize_system(64);
+}
+
+void initialize_command()
+{
+	quitCommand = command_new(&quit, SDLK_ESCAPE);
 }
 
 /*eol@eof*/
