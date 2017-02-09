@@ -1,11 +1,20 @@
+#include <math.h>
+#include <stdio.h>
+
 #include "graphics3d.h"
 #include "simple_logger.h"
 #include "shader.h"
 
-static SDL_GLContext __graphics3d_gl_context;
-static SDL_Window  * __graphics3d_window = NULL;
-static GLuint        __graphics3d_shader_program;
-static Uint32        __graphics3d_frame_delay = 33;
+static SDL_GLContext		__graphics3d_gl_context;
+static SDL_Window			*__graphics3d_window = NULL;
+static GLuint				__graphics3d_shader_program;
+
+/* timing things */
+static Uint32				graphicsFrameDelay = 33;
+static Uint32				graphicsNow = 0;
+static Uint32				graphicsThen = 0;
+static Uint8				graphicsPrintFPS = 1;
+static float				graphicsFPS = 0; 
 
 void graphics3d_close();
 
@@ -16,15 +25,20 @@ GLuint graphics3d_get_shader_program()
 
 void graphics3d_next_frame()
 {
-    static Uint32 then = 0;
-    Uint32 now;
+    Uint32 difference;
+	graphicsThen = graphicsNow;
+	graphicsNow = SDL_GetTicks();
+	difference = (graphicsNow - graphicsThen);
     SDL_GL_SwapWindow(__graphics3d_window);
-    now = SDL_GetTicks();
-    if ((now - then) < __graphics3d_frame_delay)
+    if (difference < graphicsFrameDelay)
     {
-        SDL_Delay(__graphics3d_frame_delay - (now - then));        
+        SDL_Delay(graphicsFrameDelay - difference);        
     }
-    then = now;
+    graphicsFPS = 1000.0/MAX(SDL_GetTicks() - graphicsThen,0.001);
+    if (graphicsPrintFPS)
+    {
+        printf("FPS: %f\n",graphicsFPS); //printf so the log isn't filled with frame rate
+    }
 }
 
 int graphics3d_init(int sw,int sh,int fullscreen,const char *project,Uint32 frameDelay)
@@ -38,7 +52,7 @@ int graphics3d_init(int sw,int sh,int fullscreen,const char *project,Uint32 fram
         return -1;
     }
     atexit(SDL_Quit);
-    __graphics3d_frame_delay = frameDelay;
+    graphicsFrameDelay = frameDelay;
     
     __graphics3d_window = SDL_CreateWindow(project?project:"gametest3d",
                               SDL_WINDOWPOS_UNDEFINED,

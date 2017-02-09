@@ -7,6 +7,11 @@ static Command	*commandList = NULL;
 static int		commandNum = 0;
 static int		commandMax = 0;
 
+static Uint8	getInputDelay = 1;
+static Uint32	inputTime = 0;
+static Uint32	inputExecuted = 0;
+static Uint32	inputDelay = 0;
+
 
 Command *command_new(void (*command_to_execute)(), SDL_Keycode key_bind)
 {
@@ -27,6 +32,7 @@ Command *command_new(void (*command_to_execute)(), SDL_Keycode key_bind)
 		memset(&commandList[i],0,sizeof(Command));
 
 		commandList[i].used = 1;
+		commandList[i].bound_key = key_bind;
 		commandList[i].command_to_execute = command_to_execute;
 		commandNum++;
 
@@ -111,7 +117,8 @@ void handle_input_event(SDL_Event sdl_event)
 	switch(sdl_event.type)
 	{
 		case SDL_KEYDOWN:
-			slog("key pressed");
+			if(getInputDelay)
+				inputTime = SDL_GetTicks();
 			execute_all_bound(sdl_event.key.keysym.sym);
 			break;
 		case SDL_KEYUP:
@@ -123,10 +130,8 @@ void handle_input_event(SDL_Event sdl_event)
 void execute_all_bound(SDL_Keycode key_pressed)
 {
 	int i;
-	slog("%d",commandMax);
-	for(i = commandMax; i > 0; i--)
+	for(i = 0; i < commandMax; i++)
 	{
-		slog("%d",commandList[i].used);
 		if(!commandList[i].used)
 		{
 			continue;
@@ -136,6 +141,12 @@ void execute_all_bound(SDL_Keycode key_pressed)
 			continue;
 		}
 
+		if(getInputDelay)
+		{
+			inputExecuted = SDL_GetTicks();
+			inputDelay = inputExecuted - inputTime;
+			slog("Input Delay: %d Ticks",inputDelay);
+		}
 		commandList[i].command_to_execute();
 	}
 }

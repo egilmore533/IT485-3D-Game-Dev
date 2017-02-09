@@ -24,6 +24,11 @@
 #include <SDL.h>
 #include <GL/glew.h>
 
+#define MAX(a,b) (a>b?a:b)	/**< example macro to return the largest of two values. can be read as: if a greater than b then a, else b */
+
+#define MIN(a,b) (a<b?a:b)	/**< example macro to return the smallest of two values. can be read as: if a less than b then a, else b */
+
+
 /**
  * @brief initialize the 3d graphics system
  * @param sw the screen width you want
