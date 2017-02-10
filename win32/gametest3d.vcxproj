@@ -16,12 +16,14 @@
     <ClCompile Include="..\src\input.c" />
     <ClCompile Include="..\src\shader.c" />
     <ClCompile Include="..\src\simple_logger.c" />
+    <ClCompile Include="..\src\sprite.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\graphics3d.h" />
     <ClInclude Include="..\include\input.h" />
     <ClInclude Include="..\include\shader.h" />
     <ClInclude Include="..\include\simple_logger.h" />
+    <ClInclude Include="..\include\sprite.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

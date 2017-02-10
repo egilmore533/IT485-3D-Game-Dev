@@ -30,6 +30,9 @@
     <ClCompile Include="..\src\input.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sprite.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\graphics3d.h">
@@ -42,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
