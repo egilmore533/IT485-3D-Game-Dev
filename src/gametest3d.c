@@ -38,6 +38,7 @@ static Command	*forwardCommand = NULL;
 static Command	*backwardCommand = NULL;
 static Command	*rightCommand = NULL;
 static Command	*leftCommand = NULL;
+static Command	*mouseMoveCommand = NULL;
 
 static const GLfloat g_vertex_buffer_data[] = {
     -1.0f,-1.0f,-1.0f, // triangle 1 : begin
@@ -271,6 +272,7 @@ void initialize_command()
 	backwardCommand = command_new(&camera_translate_backward, SDLK_s);
 	rightCommand = command_new(&camera_translate_backward, SDLK_d);
 	leftCommand = command_new(&camera_translate_backward, SDLK_a);
+	mouseMoveCommand = command_new(&camera_translate_forward, NULL);
 }
 
 /*eol@eof*/

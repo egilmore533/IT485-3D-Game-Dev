@@ -158,11 +158,16 @@ static void camera_translate(Camera *camera, glm::vec3 direction, Uint8 pos)
 {
 	Uint32 time = get_game_time();
 	float cam_speed = 5.0f * time / 1000;
-
 	if(pos)
+	{
 		cameraList[0].position += cam_speed * cameraList[0].forward;
+	}
 	else
+	{
 		cameraList[0].position -= cam_speed * cameraList[0].forward;
+	}
+
+	camera->view_matrix = glm::lookAt(camera->position, camera->position + camera->forward, cameraList->up);
 }
 
 /**

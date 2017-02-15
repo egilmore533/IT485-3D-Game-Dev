@@ -22,6 +22,4 @@ void handle_input_event(SDL_Event sdl_event);
 
 void get_all_events();
 
-char get_game_loop_status();
-
 #endif

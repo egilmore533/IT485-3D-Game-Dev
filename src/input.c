@@ -123,6 +123,9 @@ void handle_input_event(SDL_Event sdl_event)
 			break;
 		case SDL_KEYUP:
 			break;
+		case SDL_MOUSEMOTION:
+			if(getInputDelay)
+				inputTime = SDL_GetTicks();
 	}
 	return;
 }
