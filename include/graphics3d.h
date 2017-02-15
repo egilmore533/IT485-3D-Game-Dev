@@ -53,4 +53,10 @@ void graphics3d_next_frame();
 
 void graphics3d_frame_begin();
 
+/**
+ * @brief gets the game time
+ * @return the current game time
+ */
+Uint32 get_game_time();
+
 #endif

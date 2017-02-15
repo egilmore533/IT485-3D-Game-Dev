@@ -1,11 +1,13 @@
 #ifndef __INPUT_H__
 #define __INPUT_H__
 
-typedef struct 
+#include "camera.h"
+
+typedef struct
 {
-	Uint32 used;
-	SDL_Keycode bound_key;
-	void (*command_to_execute) ();
+	Uint32 used;								/**< in use flag */
+	SDL_Keycode bound_key;						/**< the key that has been bound to this command */
+	void (*command_to_execute)();				/**< the code to be executed in this command, this will take an entity eventually */
 }Command;
 
 Command *command_new(void (*command_to_execute)(), SDL_Keycode key_bind);

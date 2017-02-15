@@ -24,6 +24,7 @@
 #include "graphics3d.h"
 #include "shader.h"
 #include "input.h"
+#include "camera.h"
 
 #define WINDOW_WIDTH			1024.0f
 #define WINDOW_HEIGHT			768.0f
@@ -33,6 +34,10 @@
 
 static Uint8	gameLoop = 1;
 static Command	*quitCommand = NULL;
+static Command	*forwardCommand = NULL;
+static Command	*backwardCommand = NULL;
+static Command	*rightCommand = NULL;
+static Command	*leftCommand = NULL;
 
 static const GLfloat g_vertex_buffer_data[] = {
     -1.0f,-1.0f,-1.0f, // triangle 1 : begin
@@ -120,18 +125,17 @@ void initialize_systems();
 
 void initialize_command();
 
-glm::vec3 updateCameraPosition(glm::vec3 cameraPosition, glm::mat4 translationMatrix);
-
 int main(int argc, char *argv[])
 {
+	Camera *camera;
 	glm::vec3 cameraPosition = glm::vec3(4.0f, 3.0f, 3.0f);
-	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::mat4 view = glm::lookAt(cameraPosition, cameraTarget, glm::vec3(0.0f,1.0f,0.0f));
-	glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), ASPECT_RATIO, NEAR_CLIPPING_PLANE, FAR_CLIPPING_PLANE);
+	//glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+	//glm::mat4 view = glm::lookAt(cameraPosition, cameraTarget, glm::vec3(0.0f,1.0f,0.0f));
+	//glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), ASPECT_RATIO, NEAR_CLIPPING_PLANE, FAR_CLIPPING_PLANE);
 	glm::mat4 model = glm::mat4(1.0f);
-	GLuint MatrixID; 
-	glm::mat4 model_view_projection = projectionMatrix * view * model;
-	glm::mat4 translationMatrix;
+	GLuint model_location, view_location, projection_location;
+	//GLuint MatrixID; 
+	//glm::mat4 model_view_projection = projectionMatrix * view * model;
 
 	GLuint vao; //vao == vertex array object
 	GLuint cubeBufferObject;
@@ -148,9 +152,15 @@ int main(int argc, char *argv[])
     }; //we love you vertices!
     
     initialize_systems();
+	camera = camera_new(glm::vec2(WINDOW_WIDTH, WINDOW_HEIGHT),cameraPosition);
 	initialize_command();
 
-	MatrixID = glGetUniformLocation(graphics3d_get_shader_program(), "model_view_projection"); //this needs to match the uniform value in the shader file
+
+	model_location = glGetUniformLocation(graphics3d_get_shader_program(), "model");
+	view_location = glGetUniformLocation(graphics3d_get_shader_program(), "view");
+	projection_location = glGetUniformLocation(graphics3d_get_shader_program(), "projection");
+	
+	//MatrixID = glGetUniformLocation(graphics3d_get_shader_program(), "model_view_projection"); //this needs to match the uniform value in the shader file
         
         
     glGenVertexArrays(1, &vao);
@@ -174,14 +184,17 @@ int main(int argc, char *argv[])
     {
 		get_all_events();
 
-		model_view_projection = projectionMatrix * view * model;
+		//model_view_projection = projectionMatrix * view * model;
 
         glClearColor(0.0,0.0,0.0,0.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         /* drawing code in here! */
 		glUseProgram(graphics3d_get_shader_program());
-        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &model_view_projection[0][0]);
+        //glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &model_view_projection[0][0]);
+		glUniformMatrix4fv(model_location, 1, GL_FALSE, &model[0][0]);
+		glUniformMatrix4fv(view_location, 1, GL_FALSE, &get_camera_view_matrix(camera)[0][0]);
+		glUniformMatrix4fv(projection_location, 1, GL_FALSE, &get_camera_projection_matrix(camera)[0][0]);
 
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, cubeBufferObject);
@@ -248,11 +261,16 @@ void initialize_systems()
         exit(-1);
     }
 	command_initialize_system(64);
+	camera_initialize_system(1);
 }
 
 void initialize_command()
 {
 	quitCommand = command_new(&quit, SDLK_ESCAPE);
+	forwardCommand = command_new(&camera_translate_forward, SDLK_w);
+	backwardCommand = command_new(&camera_translate_backward, SDLK_s);
+	rightCommand = command_new(&camera_translate_backward, SDLK_d);
+	leftCommand = command_new(&camera_translate_backward, SDLK_a);
 }
 
 /*eol@eof*/

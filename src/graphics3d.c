@@ -11,7 +11,7 @@ static GLuint				__graphics3d_shader_program;
 
 /* timing things */
 static Uint32				graphicsFrameDelay = 33;
-static Uint32				graphicsNow = 0;
+static Uint32				time = 0;
 static Uint32				graphicsThen = 0;
 static Uint8				graphicsPrintFPS = 1;
 static float				graphicsFPS = 0; 
@@ -26,9 +26,9 @@ GLuint graphics3d_get_shader_program()
 void graphics3d_next_frame()
 {
     Uint32 difference;
-	graphicsThen = graphicsNow;
-	graphicsNow = SDL_GetTicks();
-	difference = (graphicsNow - graphicsThen);
+	graphicsThen = time;
+	time = SDL_GetTicks();
+	difference = (time - graphicsThen);
     SDL_GL_SwapWindow(__graphics3d_window);
     if (difference < graphicsFrameDelay)
     {
@@ -122,5 +122,13 @@ void graphics3d_frame_begin()
     glPushMatrix();
 }
 
+/**
+ * @brief gets the game time
+ * @return the current game time
+ */
+Uint32 get_game_time()
+{
+	return time;
+}
 
 /*eol@eof*/

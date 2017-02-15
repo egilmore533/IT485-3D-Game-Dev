@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\camera.c" />
     <ClCompile Include="..\src\gametest3d.c" />
     <ClCompile Include="..\src\graphics3d.c" />
     <ClCompile Include="..\src\input.c" />
@@ -19,6 +20,7 @@
     <ClCompile Include="..\src\sprite.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\camera.h" />
     <ClInclude Include="..\include\graphics3d.h" />
     <ClInclude Include="..\include\input.h" />
     <ClInclude Include="..\include\shader.h" />
@@ -26,6 +28,8 @@
     <ClInclude Include="..\include\sprite.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\shaders\fs1.glsl" />
+    <None Include="..\shaders\vs1.glsl" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
