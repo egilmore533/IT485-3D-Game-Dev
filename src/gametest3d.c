@@ -129,15 +129,10 @@ void initialize_command();
 int main(int argc, char *argv[])
 {
 	Camera *camera;
-	glm::vec3 cameraPosition = glm::vec3(4.0f, 3.0f, 3.0f);
-	//glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-	//glm::mat4 view = glm::lookAt(cameraPosition, cameraTarget, glm::vec3(0.0f,1.0f,0.0f));
-	//glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), ASPECT_RATIO, NEAR_CLIPPING_PLANE, FAR_CLIPPING_PLANE);
+	glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::mat4 model = glm::mat4(1.0f);
 	GLuint model_location, view_location, projection_location;
-	//GLuint MatrixID; 
-	//glm::mat4 model_view_projection = projectionMatrix * view * model;
-
+	
 	GLuint vao; //vao == vertex array object
 	GLuint cubeBufferObject;
 	GLuint colorbuffer;
@@ -192,8 +187,7 @@ int main(int argc, char *argv[])
 
         /* drawing code in here! */
 		glUseProgram(graphics3d_get_shader_program());
-        //glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &model_view_projection[0][0]);
-		glUniformMatrix4fv(model_location, 1, GL_FALSE, &model[0][0]);
+        glUniformMatrix4fv(model_location, 1, GL_FALSE, &model[0][0]);
 		glUniformMatrix4fv(view_location, 1, GL_FALSE, &get_camera_view_matrix(camera)[0][0]);
 		glUniformMatrix4fv(projection_location, 1, GL_FALSE, &get_camera_projection_matrix(camera)[0][0]);
 
@@ -224,20 +218,6 @@ int main(int argc, char *argv[])
 		glDisableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 
-		/*
-		glBindBuffer(GL_ARRAY_BUFFER, cubeBufferObject); //bind the buffer we're applying attributes to
-        glEnableVertexAttribArray(0); //0 is our index, refer to "location = 0" in the vertex shader
-        glEnableVertexAttribArray(1); //attribute 1 is for vertex color data
-        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0); //tell gl (shader!) how to interpret our vertex data
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)(12 * sizeof(float))); //color data is 48 bytes in to the array
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-        glUseProgram(0);
-
-		*/
-        /* drawing code above here! */
         graphics3d_next_frame();
     } 
     return 0;
@@ -267,12 +247,12 @@ void initialize_systems()
 
 void initialize_command()
 {
-	quitCommand = command_new(&quit, SDLK_ESCAPE);
-	forwardCommand = command_new(&camera_translate_forward, SDLK_w);
-	backwardCommand = command_new(&camera_translate_backward, SDLK_s);
-	rightCommand = command_new(&camera_translate_backward, SDLK_d);
-	leftCommand = command_new(&camera_translate_backward, SDLK_a);
-	mouseMoveCommand = command_new(&camera_translate_forward, NULL);
+	quitCommand = command_new(SDLK_ESCAPE, &quit, NULL);
+	forwardCommand = command_new(SDLK_w, &camera_translate_forward, NULL);
+	backwardCommand = command_new(SDLK_s, &camera_translate_backward, NULL);
+	rightCommand = command_new(SDLK_d, &camera_translate_backward, NULL);
+	leftCommand = command_new(SDLK_a, &camera_translate_backward, NULL);
+	mouseMoveCommand = command_new(NULL, NULL, &camera_rotate);
 }
 
 /*eol@eof*/

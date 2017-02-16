@@ -10,6 +10,14 @@
 #define NEAR_CLIPPING_PLANE		0.1f
 #define FAR_CLIPPING_PLANE		100.0f
 
+enum Direction
+{
+	Forward,
+	Backward,
+	Right,
+	Left
+};
+
 
 typedef struct
 {
@@ -29,6 +37,8 @@ typedef struct
 
 	glm::mat4 view_matrix;			
 	glm::mat4 projection_matrix;
+
+	int prev_mouse_x, prev_mouse_y;
 }Camera;
 
 /**
@@ -85,15 +95,7 @@ void camera_translate_left();
  */
 void camera_translate_right();
 
-/**
- * @brief rotates the camera right by 1 degree
- */
-void camera_rotate_right();
-
-/**
- * @brief rotates the camera left by 1 degree
- */
-void camera_rotate_left();
+void camera_rotate();
 
 /**
  * @brief gets a camera from the camrea list based on the cameras number

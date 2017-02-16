@@ -13,7 +13,7 @@ static GLuint				__graphics3d_shader_program;
 static Uint32				graphicsFrameDelay = 33;
 static Uint32				time = 0;
 static Uint32				graphicsThen = 0;
-static Uint8				graphicsPrintFPS = 1;
+static Uint8				graphicsPrintFPS = 0;
 static float				graphicsFPS = 0; 
 
 void graphics3d_close();
@@ -96,6 +96,7 @@ int graphics3d_init(int sw,int sh,int fullscreen,const char *project,Uint32 fram
         return -1;
     }
     
+	SDL_SetRelativeMouseMode(SDL_TRUE);
     
     __graphics3d_shader_program = BuildShaderProgram("shaders/vs1.glsl", "shaders/fs1.glsl");
     if (__graphics3d_shader_program == -1)

@@ -1,7 +1,7 @@
-#include <SDL.h>
 #include <stdio.h>
 #include "simple_logger.h"
 #include "input.h"
+#include "graphics3d.h"
 
 static Command	*commandList = NULL;
 static int		commandNum = 0;
@@ -12,8 +12,11 @@ static Uint32	inputTime = 0;
 static Uint32	inputExecuted = 0;
 static Uint32	inputDelay = 0;
 
+void update_input_time();
+void slog_input_delay();
 
-Command *command_new(void (*command_to_execute)(), SDL_Keycode key_bind)
+
+Command *command_new(SDL_Keycode key_bind, void (*command_to_execute)(), void (*motion_command_to_execute)())
 {
 	int i;
 	/*makesure we have the room for a new sprite*/
@@ -34,6 +37,7 @@ Command *command_new(void (*command_to_execute)(), SDL_Keycode key_bind)
 		commandList[i].used = 1;
 		commandList[i].bound_key = key_bind;
 		commandList[i].command_to_execute = command_to_execute;
+		commandList[i].motion_command_to_execute = motion_command_to_execute;
 		commandNum++;
 
 		return &commandList[i];
@@ -80,6 +84,7 @@ void command_initialize_system(int maxCommands)
 	{
 		commandList[i].command_to_execute = NULL;
 		commandList[i].bound_key = NULL;
+		commandList[i].motion_command_to_execute = NULL;
 	}
 	commandMax = maxCommands;
 	atexit(command_close_system);
@@ -114,18 +119,21 @@ void get_all_events()
 
 void handle_input_event(SDL_Event sdl_event)
 {
+	update_input_time();
 	switch(sdl_event.type)
 	{
 		case SDL_KEYDOWN:
-			if(getInputDelay)
-				inputTime = SDL_GetTicks();
 			execute_all_bound(sdl_event.key.keysym.sym);
 			break;
 		case SDL_KEYUP:
 			break;
 		case SDL_MOUSEMOTION:
-			if(getInputDelay)
-				inputTime = SDL_GetTicks();
+			execute_motion_commands();
+			break;
+		case SDL_CONTROLLERAXISMOTION:
+			execute_motion_commands();
+			break;
+			
 	}
 	return;
 }
@@ -144,13 +152,44 @@ void execute_all_bound(SDL_Keycode key_pressed)
 			continue;
 		}
 
-		if(getInputDelay)
-		{
-			inputExecuted = SDL_GetTicks();
-			inputDelay = inputExecuted - inputTime;
-			slog("Input Delay: %d Ticks",inputDelay);
-		}
+		slog_input_delay();
 		commandList[i].command_to_execute();
 	}
 }
 
+void execute_motion_commands()
+{
+	int i;
+	for(i = 0; i < commandMax; i++)
+	{
+		if(!commandList[i].used)
+		{
+			continue;
+		}
+		if(!commandList[i].motion_command_to_execute)
+		{
+			continue;
+		}
+
+		slog_input_delay();
+		commandList[i].motion_command_to_execute();
+	}
+}
+
+void update_input_time()
+{
+	if(getInputDelay)
+	{
+		inputTime = get_game_time();
+	}
+}
+
+void slog_input_delay()
+{
+	if(getInputDelay)
+	{
+		inputExecuted = SDL_GetTicks();
+		inputDelay = inputExecuted - inputTime;
+		slog("Input Delay: %d Ticks",inputDelay);
+	}
+}
